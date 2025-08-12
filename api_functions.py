@@ -13,13 +13,9 @@ class Api_Calls:
         nasa_api_key = settings.User_Settings.retrieve_user_settings()[0]
         url = 'https://api.nasa.gov/planetary/apod?api_key='
         og_file = f'original_file/nasa_potd_{datetime.today().strftime('%Y_%m_%d')}.jpg'
-        rzd_file = f'resized_file/nasa_potd_{datetime.today().strftime('%Y_%m_%d')}.jpg'
-
         os.makedirs('nasa/original_file', exist_ok=True)
         api_call = requests.get(url + nasa_api_key)
         data = api_call.json()
-
-        print(data)
 
         response = requests.get(data['hdurl'])
         filename = og_file.replace('original_file/', '')
@@ -34,15 +30,18 @@ class Api_Calls:
 
     @staticmethod
     def call_wallhaven_api(resolution, sorting='random', query='space'):
-        wallhaven_api_key = settings.User_Settings.retrieve_user_settings()[1]
-        query= settings.User_Settings.retrieve_user_settings()[2]
-        print(wallhaven_api_key)
+        wallhaven_api_key = settings.User_Settings.retrieve_user_settings()['API_KEYS']['wallhaven']
+        query = settings.User_Settings.retrieve_user_settings()['API_SETTINGS']['query']
+
         url = f'https://wallhaven.cc/api/v1/search?apikey={wallhaven_api_key}&q={query}&resolutions={resolution}&sorting={sorting}&seed=Ehdi58'
         os.makedirs('C:/Users/Corentin/Pictures/Wallpapers/wallhaven/original_file/', exist_ok=True)
+
         api_call = requests.get(url)
+
         data = api_call.json()
-        print("Data", data)
+
         url = data['data'][0]['path']
+
         filename = url.replace('https://w.wallhaven.cc/full/', '')
         filename = filename.replace('/', '-')
         response = requests.get(data['data'][0]['path'])

@@ -5,6 +5,7 @@ from PyQt6.QtWidgets import QMainWindow, QApplication, QMessageBox, QLabel, QCom
 import settings
 
 
+
 # TODO: Clean this shh up
 
 class GUI(QMainWindow):
@@ -24,7 +25,7 @@ class GUI(QMainWindow):
         self.setWindowTitle("User Settings")
         self.setGeometry(100, 100, 300, 200)
 
-        self.source_combo_box.addItems(["NASA", "Wallhaven"])
+        self.source_combo_box.addItems(["Wallhaven", "Nasa"])
         self.source_combo_box.move(10, 40)
         self.source_combo_box.currentTextChanged.connect(self.combo_box_selection)
         self.source_combo_box.resize(100, 20)
@@ -38,15 +39,6 @@ class GUI(QMainWindow):
         self.api_user_input.setEchoMode(QLineEdit.EchoMode.Password)
         self.api_user_input.setPlaceholderText("Enter your API key here")
 
-        self.save_button.move(10, 100)
-        self.save_button.clicked.connect(
-            lambda: settings.User_Settings.set_user_settings(
-                self.source_combo_box.currentText(),
-                self.api_user_input.text(),
-                self.query_input.text().lower()
-            )
-        )
-
         self.query_label.setText("Enter your query:")
         self.query_label.move(10, 130)
         self.query_label.resize(280, 20)
@@ -54,15 +46,25 @@ class GUI(QMainWindow):
         self.query_input.resize(280, 20)
         self.query_input.setPlaceholderText("Enter your query here")
 
-        self.sort_type.setText("Enter your sorting type:")
+        self.sort_type.setText("Sorting type: Random")
         self.sort_type.move(10, 170)
         self.sort_type.resize(280, 20)
+
+        self.save_button.move(10, 100)
+        self.save_button.clicked.connect(
+            lambda: settings.User_Settings.set_user_settings(
+                self.source_combo_box.currentText(),
+                self.api_user_input.text(),
+                self.query_input.text().lower(),
+                window_instance=self
+
+            )
+
+        )
 
     def combo_box_selection(self):
         content = self.source_combo_box.currentText()
         self.api_label.setText(f"Enter your {content} API key:")
-
-
 
     @staticmethod
     def query_selection():
@@ -71,7 +73,6 @@ class GUI(QMainWindow):
         inputdial.setWindowTitle("Query Selection")
         inputdial.setModal(True)
         inputdial.exec()
-        print(inputdial.textValue())
         settings.User_Settings.changer_user_settings(inputdial.textValue())
 
 
@@ -94,7 +95,7 @@ class Program_Setup:
         if result == QMessageBox.StandardButton.Yes:
             Program_Setup.user_setup()
         else:
-            print("No")
+            print("This shouldn't print tbh")
 
     @staticmethod
     def user_setup():

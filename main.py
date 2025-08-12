@@ -1,34 +1,42 @@
 # Library Imports
-import ctypes
 import os
 import sys
 import time
+
 from PyQt6.QtWidgets import QApplication
-import settings
+
 # Self-imports
-from api_calls import Api_Calls
-from file_funcs import File_Processing
+from api_functions import Api_Calls
+from os_functions import File_Processing, OS_Interaction
 from settings import User_Settings
 
-app = QApplication(sys.argv)
 
-User_Settings.config_check()
-monitor_res = str(User_Settings.get_screen_info().width) + 'x' + str(User_Settings.get_screen_info().height)
+def main():
+    app = QApplication(sys.argv)  # Ensures that GUI can run anytime
+    User_Settings.config_check()
+    config = User_Settings.retrieve_user_settings()
+
+    api_to_call = config['API_SETTINGS']['source'].lower()
+    func_name = f'call_{api_to_call}_api'
+    func = getattr(Api_Calls, func_name, None)
+
+    if func and callable(func): #Dynamic function call to ensure the right api is called
+        source, filename = func(resolution=config['API_SETTINGS']['resolution'],
+                                query=config['API_SETTINGS']['query'])
+    else:
+        raise Exception("Invalid API source")
 
 
-source = Api_Calls.call_wallhaven_api(resolution=monitor_res,
-                                      query=settings.User_Settings.retrieve_user_settings()[2], )
-File_Processing.image_resize(source)
 
-absolute = os.path.abspath(
-    f'C:/Users/Corentin/Pictures/Wallpapers/{source[0]}/resized_file/{source[1]}')  # TODO:Create adaptative path
+    File_Processing.image_resize(source, filename)
 
-time.sleep(1)
+    user_pic_folder = OS_Interaction.get_picture_path()
+    filepath = os.path.abspath(
+        f'{user_pic_folder}/Wallpapers/{source}/resized_file/{filename}')  # finds path regardless of user modifications
 
-ctypes.windll.user32.SystemParametersInfoW(
-    # This changes Windows's wallpaper, the 4th argument has to be 3 to update and lock wallpaper beyond reboot
-    20,
-    0,
-    absolute,
-    3
-)
+    time.sleep(1)
+
+    OS_Interaction.set_wallpaper(filepath)
+
+
+main()
