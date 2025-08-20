@@ -9,6 +9,8 @@ You'll have to get yourself an API key from the currently [supported sources](#S
 
 Don't forget to click save as I didn't implement a failsafe for closing the window yet.
 
+You will also have to install the requirements, to do so, right click in the project folder, open a terminal, and run `pip install -r requirements.txt`
+
 To launch `main.py`, simply right click in the folder, open terminal, and type `python main.py`
 
 (Note: The images will be savec in your Default Picture Folder, yes, even if you modified the path, as long as windows recognize it as such, so remember to empty it from time to time if you don't want to keep the old files)
@@ -40,8 +42,6 @@ The changes that I plan to make are as follow:
 
 - If API allows, restrictions on tag (To avoid unwanted content, such as Cyberpunk 2077 when you want to have Cyberpunk Aesthetic) ***(High Priority)***
 - Add a way to delete older wallpapers files (User Selection, on new, on amount, on time) ***(High Priority)***
-- Workaround NASA using GIF sometimes *
-- Add a setting button on subsequent `main.py` runs to edit API key(s), source or any other settings
 - Add other sources *(If you have requests for sources, contact me)*
 - Make the script run on a timer in the background (User selection, can be a one time run or a background run) maybe as a service, maybe as a script *(Maybe user selection as well?)*
 - Make the wallpaper change start as soon as the setup is saved *(Low priority)*
