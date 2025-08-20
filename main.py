@@ -2,41 +2,32 @@
 import os
 import sys
 import time
-
+import PyQt6.QtWidgets
 from PyQt6.QtWidgets import QApplication
 
 # Self-imports
-from api_functions import Api_Calls
-from os_functions import File_Processing, OS_Interaction
-from settings import User_Settings
+from settings.user_settings import User_Settings
+from GUI import main_gui, first_dial
 
 
 def main():
     app = QApplication(sys.argv)  # Ensures that GUI can run anytime
-    User_Settings.config_check()
-    config = User_Settings.retrieve_user_settings()
 
-    api_to_call = config['API_SETTINGS']['source'].lower()
-    func_name = f'call_{api_to_call}_api'
-    func = getattr(Api_Calls, func_name, None)
+    print(os.getcwd())
 
-    if func and callable(func): #Dynamic function call to ensure the right api is called
-        source, filename = func(resolution=config['API_SETTINGS']['resolution'],
-                                query=config['API_SETTINGS']['query'])
+    with open("C:/Users/Corentin/PycharmProjects/PythonProject3/style.qss", "r") as file:
+        _style = file.read()
+        app.setStyleSheet(_style)
+
+    check_first_launch = User_Settings.check_first_launch()
+
+    print("Check", check_first_launch)
+    if not check_first_launch:
+        main_gui.normal_startup.user_query_gui()
     else:
-        raise Exception("Invalid API source")
+        print("I went here")
+        first_dial.Program_Setup.is_first_launch()
 
 
-
-    File_Processing.image_resize(source, filename)
-
-    user_pic_folder = OS_Interaction.get_picture_path()
-    filepath = os.path.abspath(
-        f'{user_pic_folder}/Wallpapers/{source}/resized_file/{filename}')  # finds path regardless of user modifications
-
-    time.sleep(1)
-
-    OS_Interaction.set_wallpaper(filepath)
-
-
+# os.remove("config.ini")
 main()

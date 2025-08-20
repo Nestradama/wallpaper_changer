@@ -1,25 +1,42 @@
-import sys
-from PyQt6.QtWidgets import QMainWindow, QApplication, QMessageBox, QLabel, QComboBox, QLineEdit, QPushButton, \
+from PyQt6.QtWidgets import QMainWindow, QLabel, QComboBox, QLineEdit, QPushButton, \
     QInputDialog
 
-import settings
 
-
-
-# TODO: Clean this shh up
-
-class GUI(QMainWindow):
+class First_Setup(QMainWindow):
     def __init__(self):
         super().__init__()
         self.source_combo_box = QComboBox(self)
         self.api_label = QLabel(self)
         self.api_user_input = QLineEdit(self)
         self.save_button = QPushButton("Save", self)
+        self.save_button.setStyleSheet(
+            """
+            background-color: #262626;
+            color: white;
+            font-family: Titillium Web, sans-serif;
+            font-size: 12px;
+            """
+        )
+        self.main_window = None
+
         self.query_label = QLabel(self)
         self.query_input = QLineEdit(self)
         self.sort_type = QLabel(self)
 
         self.setup_ui()
+
+    def save_bt_clicked(self):
+        from settings import user_settings
+        user_settings.User_Settings.set_user_settings(
+            self.source_combo_box.currentText(),
+            self.api_user_input.text(),
+            self.query_input.text().lower()
+        )
+        self.close()
+
+        from GUI.main_gui import normal_startup
+        self.main_window = normal_startup()
+        self.main_window.show()
 
     def setup_ui(self):
         self.setWindowTitle("User Settings")
@@ -51,16 +68,7 @@ class GUI(QMainWindow):
         self.sort_type.resize(280, 20)
 
         self.save_button.move(10, 100)
-        self.save_button.clicked.connect(
-            lambda: settings.User_Settings.set_user_settings(
-                self.source_combo_box.currentText(),
-                self.api_user_input.text(),
-                self.query_input.text().lower(),
-                window_instance=self
-
-            )
-
-        )
+        self.save_button.clicked.connect(lambda: self.save_bt_clicked())
 
     def combo_box_selection(self):
         content = self.source_combo_box.currentText()
@@ -74,32 +82,3 @@ class GUI(QMainWindow):
         inputdial.setModal(True)
         inputdial.exec()
         settings.User_Settings.changer_user_settings(inputdial.textValue())
-
-
-class Program_Setup:
-    def __init__(self):
-        pass
-
-    @staticmethod
-    def is_first_launch():
-
-        msg_box = QMessageBox()
-
-        msg_box.setIcon(QMessageBox.Icon.Question)
-        msg_box.setText("Is this your first time launching the program? (I might be wrong, just asking)")
-        msg_box.setInformativeText("If you are, you will have to enter your NASA and Wallhaven API keys.")
-        msg_box.setWindowTitle("Welcome!")
-        msg_box.setStandardButtons(QMessageBox.StandardButton.Yes | QMessageBox.StandardButton.No)
-        msg_box.setDefaultButton(QMessageBox.StandardButton.Yes)
-        result = msg_box.exec()
-        if result == QMessageBox.StandardButton.Yes:
-            Program_Setup.user_setup()
-        else:
-            print("This shouldn't print tbh")
-
-    @staticmethod
-    def user_setup():
-        app = QApplication(sys.argv)
-        main = GUI()
-        main.show()
-        sys.exit(app.exec())
